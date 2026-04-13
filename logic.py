@@ -55,7 +55,7 @@ def compute_score(train, source, destination):
 
     distance = abs(dest_idx - source_idx)
 
-    score = avg_crowd + (distance * 0.02)
+    score = avg_crowd + (distance * 0.04)
 
     return score
 
