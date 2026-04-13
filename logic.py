@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv("train_data.csv")
+df = pd.read_csv("traindata.csv")
 
 STATIONS_ORDER = [
     "Virar", "Nalasopara","Vasai Road" ,"Naigaon",
