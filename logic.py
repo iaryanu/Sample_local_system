@@ -1,4 +1,9 @@
 import pandas as pd
+from data_handling import load_data, apply_bias, add_crowd_level
+
+df = load_data()
+df = apply_bias(df)
+df = add_crowd_level(df)
 
 df = pd.read_csv("traindata.csv")
 
