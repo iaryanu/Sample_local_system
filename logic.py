@@ -22,24 +22,32 @@ FAST_STOPS_AFTER_BORIVALI = [
 ]
 
 def filter_trains(source, destination, time):
-    filtered = df[
-        (df["station_from"] == source) &
-        (df["station_to"] == destination) &
-        (df["time"] == time)
-    ]
+
+    filtered = df[df["time"] == time]
 
     valid_trains = []
 
     for train_id in filtered["train_id"].unique():
         train_data = filtered[filtered["train_id"] == train_id]
+
+        train_start = train_data.iloc[0]["station_from"]
+        train_end = train_data.iloc[0]["station_to"]
         train_type = train_data.iloc[0]["train_type"]
 
-        if train_type == "fast":
-            if not is_before_borivali(source):
-                if source not in FAST_STOPS_AFTER_BORIVALI:
-                    continue
 
-        valid_trains.append(train_data)
+        if STATIONS_ORDER.index(source) < STATIONS_ORDER.index(destination):
+
+            if (
+                STATIONS_ORDER.index(source) >= STATIONS_ORDER.index(train_start) and
+                STATIONS_ORDER.index(destination) <= STATIONS_ORDER.index(train_end)
+            ):
+
+                if train_type == "fast":
+                    if not is_before_borivali(source):
+                        if source not in FAST_STOPS_AFTER_BORIVALI:
+                            continue
+
+                valid_trains.append(train_data)
 
     return valid_trains
 
