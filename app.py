@@ -2,37 +2,57 @@ import streamlit as st
 from datetime import datetime
 from logic import get_best_options, STATIONS_ORDER
 
-st.set_page_config(page_title="SmartRail AI", layout="centered")
+st.set_page_config(page_title="SmartRail AI", layout="wide")
+
+st.markdown("""
+    <style>
+    .card {
+        background-color: #111827;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.4);
+    }
+    .title {
+        font-size: 22px;
+        font-weight: bold;
+    }
+    .small {
+        color: #9ca3af;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 st.title("🚆 SmartRail AI")
-st.subheader("Find the Best Train & Compartment")
+st.markdown("### Find the Best Train & Compartment")
 
-source = st.selectbox("Select Source Station", STATIONS_ORDER)
-destination = st.selectbox("Select Destination Station", STATIONS_ORDER)
-
-if "use_current_time" not in st.session_state:
-    st.session_state.use_current_time = False
-
-st.subheader("Select Time")
-
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button("Use Current Time ⏰"):
-        st.session_state.use_current_time = True
+    source = st.selectbox("Source Station", STATIONS_ORDER)
 
 with col2:
-    if st.button("Use Manual Time"):
+    destination = st.selectbox("Destination Station", STATIONS_ORDER)
+
+with col3:
+    if "use_current_time" not in st.session_state:
         st.session_state.use_current_time = False
 
+    if st.button("⏰ Use Current Time"):
+        st.session_state.use_current_time = True
 
-if st.session_state.use_current_time:
-    time = datetime.now().hour
-    st.success(f"Using Current Time: {time}:00")
-else:
-    time = st.slider("Select Time (Hour)", 0, 23, 9)
+    if st.button("🕒 Manual Time"):
+        st.session_state.use_current_time = False
 
-if st.button("Find Best Options"):
+    if st.session_state.use_current_time:
+        time = datetime.now().hour
+        st.success(f"{time}:00")
+    else:
+        time = st.slider("Hour", 0, 23, 9)
+
+st.markdown("---")
+
+if st.button("🚀 Find Best Options"):
 
     if source == destination:
         st.error("Source and destination cannot be same")
@@ -42,44 +62,51 @@ if st.button("Find Best Options"):
         if results is None:
             st.error("No trains found")
         else:
-            st.success("Top 3 Train Recommendations")
+            st.markdown("## 🚆 Top 3 Recommendations")
 
-            for i, result in enumerate(results, start=1):
+            cols = st.columns(len(results))
 
-                st.markdown(f"### 🚆 Option {i}")
-                st.write(f"Train: {result['train_id']} ({result['train_type']})")
-                st.write(f"Best Compartment: {result['best_compartment']}")
+            for i, (col, result) in enumerate(zip(cols, results), start=1):
 
-            
-                crowd = result["crowd"]
-                if crowd < 0.5:
-                    level = "Low"
-                    color = "🟢"
-                elif crowd < 0.7:
-                    level = "Medium"
-                    color = "🟡"
-                else:
-                    level = "High"
-                    color = "🔴"
+                with col:
+                    crowd = result["crowd"]
 
-                st.write(f"Crowd: {color} {level} ({round(crowd, 2)})")
-                st.write(f"Score: {result['score']}")
-
-                st.write("Compartments (Least → Most Crowded):")
-
-                for comp in result["full_ranking"]:
-                    c = comp["crowd_base"]
-
-                    if c < 0.5:
-                        lvl = "Low"
-                        icon = "🟢"
-                    elif c < 0.7:
-                        lvl = "Medium"
-                        icon = "🟡"
+                    if crowd < 0.5:
+                        level = "Low"
+                        color = "#10b981"
+                    elif crowd < 0.7:
+                        level = "Medium"
+                        color = "#f59e0b"
                     else:
-                        lvl = "High"
-                        icon = "🔴"
+                        level = "High"
+                        color = "#ef4444"
 
-                    st.write(f"Coach {comp['compartment']} → {icon} {lvl} ({round(c, 2)})")
+                    st.markdown(f"""
+                        <div class="card">
+                            <div class="title">🚆 Option {i}</div>
+                            <p class="small">Train ID</p>
+                            <b>{result['train_id']} ({result['train_type']})</b>
+                            <p class="small">Best Compartment</p>
+                            <b>{result['best_compartment']}</b>
+                            <p class="small">Crowd Level</p>
+                            <b style="color:{color}">{level} ({round(crowd,2)})</b>
+                            <p class="small">Score</p>
+                            <b>{result['score']}</b>
+                        </div>
+                    """, unsafe_allow_html=True)
 
-                st.divider()
+                    with st.expander("View Compartments"):
+                        for comp in result["full_ranking"]:
+                            c = comp["crowd_base"]
+
+                            if c < 0.5:
+                                lvl = "Low"
+                                icon = "🟢"
+                            elif c < 0.7:
+                                lvl = "Medium"
+                                icon = "🟡"
+                            else:
+                                lvl = "High"
+                                icon = "🔴"
+
+                            st.write(f"{icon} Coach {comp['compartment']} → {lvl} ({round(c,2)})")
