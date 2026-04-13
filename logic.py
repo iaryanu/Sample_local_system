@@ -3,7 +3,7 @@ import pandas as pd
 df = pd.read_csv("train_data.csv")
 
 STATIONS_ORDER = [
-    "Virar", "Vasai Road", "Nalasopara", "Naigaon",
+    "Virar", "Nalasopara","Vasai Road" ,"Naigaon",
     "Bhayandar", "Mira Road", "Dahisar", "Borivali",
     "Kandivali", "Malad", "Goregaon", "Jogeshwari",
     "Andheri", "Vile Parle", "Santacruz", "Bandra",
