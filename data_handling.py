@@ -1,6 +1,6 @@
 import pandas as pd
 
-def load_data(path="train_data.csv"):
+def load_data(path="traindata.csv"):
     df = pd.read_csv(path)
     return df
 

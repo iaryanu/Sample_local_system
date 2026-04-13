@@ -5,7 +5,6 @@ df = load_data()
 df = apply_bias(df)
 df = add_crowd_level(df)
 
-df = pd.read_csv("traindata.csv")
 
 STATIONS_ORDER = [
     "Virar", "Nalasopara","Vasai Road" ,"Naigaon",
