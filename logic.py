@@ -41,17 +41,17 @@ def filter_trains(source, destination, time):
 
 
 def select_best_train(valid_trains):
-    best_train = None
-    best_score = float("inf")
+     best_train = None
+     best_score = float("inf")
 
-    for train in valid_trains:
+     for train in valid_trains:
         avg_crowd = train["crowd_base"].mean()
 
         if avg_crowd < best_score:
             best_score = avg_crowd
             best_train = train
 
-    return best_train
+     return best_train
 
 
 def rank_compartments(train):
